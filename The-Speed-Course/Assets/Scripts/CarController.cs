@@ -17,7 +17,7 @@ public class CarController : Car
 
     [SerializeField] protected float rotationSpeed;
 
-    public float carSpeedInKPH;
+    [SerializeField] protected float carSpeedInKPH;
 
     [SerializeField] WheelCollider FrontLeftWheel;
     [SerializeField] WheelCollider FrontRightWheel;
@@ -110,5 +110,10 @@ public class CarController : Car
     {
         previousPos = transform.position;
         fwd = transform.forward;
+    }
+
+    public float GetCurrentSpeed()
+    {
+        return carSpeedInKPH;
     }
 }
