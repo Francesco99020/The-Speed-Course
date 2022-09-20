@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-public class CarController : MonoBehaviour
+public class CarController : Car
 {
     private float verticalInput;
     private float horizontalInput;
@@ -15,11 +15,7 @@ public class CarController : MonoBehaviour
 
     bool isGoingForward;
 
-    [SerializeField] protected float forwardSpeed = 430000.0f;
-    [SerializeField] protected float BackwardSpeed = 200000.0f;
-    [SerializeField] protected float rotationSpeed = 10.0f;
-    [SerializeField] protected float maxSpeedInKPH = 100.0f;
-    [SerializeField] protected float maxReverseSpeedInKPH = 30.0f;
+    [SerializeField] protected float rotationSpeed;
 
     public float carSpeedInKPH;
 
@@ -27,14 +23,39 @@ public class CarController : MonoBehaviour
     [SerializeField] WheelCollider FrontRightWheel;
     [SerializeField] WheelCollider BackLeftWheel;
     [SerializeField] WheelCollider BackRightWheel;
+
     protected Rigidbody CarRb;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        CarRb = GetComponent<Rigidbody>();
-        //CarRb.centerOfMass = COM.transform.position;
+        //SUV
+        if(SceneManagerScript.instance.playerChoice == 0)
+        {
+            SetForwardSpeed(60000);
+            SetBackwardSpeed(20000);
+            SetMaxSpeed(190);
+            SetReverseMaxSpeed(30);
+        }
+        //Truck
+        else if(SceneManagerScript.instance.playerChoice == 1)
+        {
+            SetForwardSpeed(50000);
+            SetBackwardSpeed(15000);
+            SetMaxSpeed(150);
+            SetReverseMaxSpeed(25);
+        }
+        //Tank
+        else if(SceneManagerScript.instance.playerChoice == 2)
+        {
+            SetForwardSpeed(40000);
+            SetBackwardSpeed(10000);
+            SetMaxSpeed(120);
+            SetReverseMaxSpeed(15);
+        }
+
+        CarRb = gameObject.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -43,22 +64,9 @@ public class CarController : MonoBehaviour
         
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
-        //transform.Rotate(Vector3.right * Time.deltaTime * horizontalInput * rotationSpeed);
 
-        if(carSpeedInKPH < 50)
-        {
-            rotationSpeed = 15;
-        }
-        else if(carSpeedInKPH > 50 && carSpeedInKPH < 70)
-        {
-            rotationSpeed = 10;
-        }
-        else
-        {
-            rotationSpeed = 5;
-        }
-        FrontLeftWheel.steerAngle = rotationSpeed * horizontalInput;
-        FrontRightWheel.steerAngle = rotationSpeed * horizontalInput;
+        rotationSpeed = SetCarTurningValue(carSpeedInKPH);
+        SetCarTurning(horizontalInput, FrontLeftWheel, FrontRightWheel);
 
         newPos = transform.position;
         movement = (newPos - previousPos);
@@ -72,56 +80,30 @@ public class CarController : MonoBehaviour
             isGoingForward = true;
         }
 
+        carSpeedInKPH = GetCurrentSpeed(CarRb);
+
         //Car is driving and still under max speed (Forward)
-        if (verticalInput >= 0 && carSpeedInKPH < maxSpeedInKPH)
+        if (verticalInput >= 0 && carSpeedInKPH < GetMaxSpeed())
         {
-            FrontLeftWheel.motorTorque = verticalInput * Time.deltaTime * forwardSpeed;
-            FrontRightWheel.motorTorque = verticalInput * Time.deltaTime * forwardSpeed;
-            BackLeftWheel.motorTorque = verticalInput * Time.deltaTime * forwardSpeed;
-            BackRightWheel.motorTorque = verticalInput * Time.deltaTime * forwardSpeed;
+            DriveForward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
         }
-        else if (isGoingForward && verticalInput >= 0 && carSpeedInKPH > maxSpeedInKPH)
+        else if (isGoingForward && carSpeedInKPH > GetMaxSpeed())
         {
-            FrontLeftWheel.motorTorque = verticalInput * Time.deltaTime;
-            FrontRightWheel.motorTorque = verticalInput * Time.deltaTime;
-            BackLeftWheel.motorTorque = verticalInput * Time.deltaTime;
-            BackRightWheel.motorTorque = verticalInput * Time.deltaTime;
+            Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
         }
 
         //Car is driving and still under max speed (Backward)
-        if (verticalInput <= 0 && carSpeedInKPH < maxReverseSpeedInKPH)
+        if (verticalInput <= 0 && carSpeedInKPH < GetReverseMaxSpeed())
         {
-            FrontLeftWheel.motorTorque = verticalInput * Time.deltaTime * BackwardSpeed;
-            FrontRightWheel.motorTorque = verticalInput * Time.deltaTime * BackwardSpeed;
-            BackLeftWheel.motorTorque = verticalInput * Time.deltaTime * BackwardSpeed;
-            BackRightWheel.motorTorque = verticalInput * Time.deltaTime * BackwardSpeed;
+            DriveBackward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
         }
-        else if (!isGoingForward && verticalInput <= 0 && carSpeedInKPH > maxReverseSpeedInKPH)
+        else if (!isGoingForward && verticalInput <= 0 && carSpeedInKPH > GetReverseMaxSpeed())
         {
-            FrontLeftWheel.motorTorque = verticalInput * Time.deltaTime;
-            FrontRightWheel.motorTorque = verticalInput * Time.deltaTime;
-            BackLeftWheel.motorTorque = verticalInput * Time.deltaTime;
-            BackRightWheel.motorTorque = verticalInput * Time.deltaTime;
+            Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
         }
 
         //Breaking
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            FrontLeftWheel.brakeTorque = 20000;
-            FrontRightWheel.brakeTorque = 20000;
-            BackLeftWheel.brakeTorque = 20000;
-            BackRightWheel.brakeTorque = 20000;
-        }
-
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            FrontLeftWheel.brakeTorque = 0;
-            FrontRightWheel.brakeTorque = 0;
-            BackLeftWheel.brakeTorque = 0;
-            BackRightWheel.brakeTorque = 0;
-        }
-
-        carSpeedInKPH = CarRb.velocity.magnitude * 3.6f;
+        Breaking(FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
     }
 
     private void LateUpdate()
