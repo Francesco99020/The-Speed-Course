@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Vehicle
+  - Obstacle
+  - Grass
+  - Wheel
+  - Road
+  - FinishLine
   layers:
   - Default
   - TransparentFX
