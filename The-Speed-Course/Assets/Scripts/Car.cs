@@ -48,6 +48,31 @@ public class Car : MonoBehaviour
         return rotationSpeed;
     }
 
+    protected float SetCarTurningValue(float carSpeedInKPH, float baseSpeedLimit)
+    {
+        if (carSpeedInKPH < baseSpeedLimit)
+        {
+            rotationSpeed = 15;
+        }
+        else if (carSpeedInKPH > baseSpeedLimit && carSpeedInKPH < baseSpeedLimit+20)
+        {
+            rotationSpeed = 10;
+        }
+        else if (carSpeedInKPH > baseSpeedLimit+20 && carSpeedInKPH < baseSpeedLimit+40)
+        {
+            rotationSpeed = 5;
+        }
+        else if (carSpeedInKPH > baseSpeedLimit+40 && carSpeedInKPH < baseSpeedLimit+50)
+        {
+            rotationSpeed = 2;
+        }
+        else
+        {
+            rotationSpeed = 1;
+        }
+        return rotationSpeed;
+    }
+
     protected float GetCurrentSpeed(Rigidbody CarRb)
     {
         currentSpeed = CarRb.velocity.magnitude * 3.6f;

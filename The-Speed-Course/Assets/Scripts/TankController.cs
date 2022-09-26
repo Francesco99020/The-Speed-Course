@@ -25,65 +25,74 @@ public class TankController : Car
     [SerializeField] WheelCollider BackLeftWheel;
     [SerializeField] WheelCollider BackRightWheel;
 
+    [SerializeField] GameObject GameManagerObject;
+    GameManager GameManagerScript;
+
     protected Rigidbody CarRb;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        SetForwardSpeed(40000);
-        SetBackwardSpeed(10000);
+        SetForwardSpeed(55000);
+        SetBackwardSpeed(23000);
         SetMaxSpeed(98);
         SetReverseMaxSpeed(15);
         CarRb = gameObject.GetComponent<Rigidbody>();
+        GameManagerScript = GameManagerObject.GetComponent<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
-
-        rotationSpeed = SetCarTurningValue(carSpeedInKPH);
-        SetCarTurning(horizontalInput, FrontLeftWheel, FrontRightWheel);
-
-        newPos = transform.position;
-        movement = (newPos - previousPos);
-
-        if (Vector3.Dot(fwd, movement) < 0)
+        if (GameManagerScript.hasCrossedTheFinishLine == true)
         {
-            isGoingForward = false;
+
         }
         else
         {
-            isGoingForward = true;
-        }
+            rotationSpeed = SetCarTurningValue(carSpeedInKPH, 20);
+            SetCarTurning(horizontalInput, FrontLeftWheel, FrontRightWheel);
 
-        carSpeedInKPH = GetCurrentSpeed(CarRb);
+            newPos = transform.position;
+            movement = (newPos - previousPos);
 
-        //Car is driving and still under max speed (Forward)
-        if (verticalInput >= 0 && carSpeedInKPH < GetMaxSpeed())
-        {
-            DriveForward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
-        }
-        else if (isGoingForward && carSpeedInKPH > GetMaxSpeed())
-        {
-            Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
-        }
+            if (Vector3.Dot(fwd, movement) < 0)
+            {
+                isGoingForward = false;
+            }
+            else
+            {
+                isGoingForward = true;
+            }
 
-        //Car is driving and still under max speed (Backward)
-        if (verticalInput <= 0 && carSpeedInKPH < GetReverseMaxSpeed())
-        {
-            DriveBackward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
-        }
-        else if (!isGoingForward && verticalInput <= 0 && carSpeedInKPH > GetReverseMaxSpeed())
-        {
-            Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
-        }
+            carSpeedInKPH = GetCurrentSpeed(CarRb);
 
-        //Breaking
-        Breaking(FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+            //Car is driving and still under max speed (Forward)
+            if (verticalInput >= 0 && carSpeedInKPH < GetMaxSpeed())
+            {
+                DriveForward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+            }
+            else if (isGoingForward && carSpeedInKPH > GetMaxSpeed())
+            {
+                Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+            }
+
+            //Car is driving and still under max speed (Backward)
+            if (verticalInput <= 0 && carSpeedInKPH < GetReverseMaxSpeed())
+            {
+                DriveBackward(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+            }
+            else if (!isGoingForward && verticalInput <= 0 && carSpeedInKPH > GetReverseMaxSpeed())
+            {
+                Costing(verticalInput, FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+            }
+
+            //Breaking
+            Breaking(FrontLeftWheel, FrontRightWheel, BackLeftWheel, BackRightWheel);
+        }
     }
 
     private void LateUpdate()
