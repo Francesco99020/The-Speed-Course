@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    List<InputEntry> entries = new List<InputEntry>();
+
     [SerializeField] GameObject SUV;
     [SerializeField] GameObject Truck;
     [SerializeField] GameObject Tank;
@@ -20,16 +23,24 @@ public class GameManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI FinishedText;
     [SerializeField] TextMeshProUGUI EndGameStatistics;
 
+    [SerializeField] string filename;
+
     [SerializeField] Button Restartbtn;
     [SerializeField] Button BackToMenubtn;
 
     public float carSpeedInKPH;
     float timerNum;
     public bool hasCrossedTheFinishLine = false;
+    private bool hasSaved = false;
 
     // Start is called before the first frame update
     void Start()
     {
+        entries = FileHandler.ReadListFromJSON<InputEntry>(filename);
+        //locks mouse to scene
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Confined;
+
         Time.timeScale = 0;
         StartCoroutine(StartCountDown());
 
@@ -53,6 +64,9 @@ public class GameManager : MonoBehaviour
     {
         if (hasCrossedTheFinishLine)
         {
+            Cursor.visible = true; 
+            Cursor.lockState = CursorLockMode.Confined;
+            string playerVehicle;
             Speedometer.gameObject.SetActive(false);
             Timer.gameObject.SetActive(false);
             FinishedText.gameObject.SetActive(true);
@@ -60,7 +74,25 @@ public class GameManager : MonoBehaviour
             EndGameStatistics.text = "Final Time: " + timerNum.ToString("#.00");
             Restartbtn.gameObject.SetActive(true);
             BackToMenubtn.gameObject.SetActive(true);
-            
+            if(SceneManagerScript.instance.playerChoice == 0)
+            {
+                playerVehicle = "SUV";
+            }
+            else if(SceneManagerScript.instance.playerChoice == 1)
+            {
+                playerVehicle = "Truck";
+            }
+            else
+            {
+                playerVehicle = "Tank";
+            }
+            if (!hasSaved)
+            {
+                AddUserToList(SceneManagerScript.instance.playerName, playerVehicle, timerNum);
+                FileHandler.SaveToJSON<InputEntry>(entries, filename);
+                hasSaved = true;
+            }
+
         }
         else
         {
@@ -88,6 +120,7 @@ public class GameManager : MonoBehaviour
 
             if (Input.GetKey(KeyCode.Escape))
             {
+                Cursor.visible = true;
                 Time.timeScale = 0;
                 PauseMenu.gameObject.SetActive(true);
             }
@@ -133,6 +166,7 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToGame()
     {
+        Cursor.visible = false;
         Time.timeScale = 1;
         PauseMenu.gameObject.SetActive(false);
     }
@@ -168,5 +202,10 @@ public class GameManager : MonoBehaviour
         Speedometer.gameObject.SetActive(true);
         Timer.gameObject.SetActive(true);
         Time.timeScale = 1;
+    }
+
+    public void AddUserToList(string name, string vehicle, float time)
+    {
+        entries.Add(new InputEntry(name, vehicle, time));
     }
 }

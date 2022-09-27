@@ -22,6 +22,7 @@ public class OutOfBounds : MonoBehaviour
     {
         if(other.gameObject.tag == "Vehicle")
         {
+            Cursor.visible = true;
             Time.timeScale = 0;
             other.gameObject.SetActive(false);
             GameOverMenu.gameObject.SetActive(true);

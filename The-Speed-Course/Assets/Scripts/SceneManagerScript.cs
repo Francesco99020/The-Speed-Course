@@ -7,6 +7,7 @@ public class SceneManagerScript : MonoBehaviour
 
     //0 = SUV, 1 = Truck, 2 = Tank
     public int playerChoice;
+    public string playerName;
 
     public static SceneManagerScript instance;
 
@@ -19,11 +20,5 @@ public class SceneManagerScript : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-
-    [System.Serializable]
-    class gameData
-    {
-        
     }
 }
