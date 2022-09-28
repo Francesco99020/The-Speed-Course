@@ -11,18 +11,7 @@ public class Car : MonoBehaviour
     private float maxReverseSpeedInKPH;
     private float currentSpeed;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    //INHERITANCE PARENT CLASS
     protected float SetCarTurningValue(float carSpeedInKPH)
     {
         if (carSpeedInKPH < 50)
@@ -48,6 +37,7 @@ public class Car : MonoBehaviour
         return rotationSpeed;
     }
 
+    //POLYMORPHISM METHOD OVERLOADING
     protected float SetCarTurningValue(float carSpeedInKPH, float baseSpeedLimit)
     {
         if (carSpeedInKPH < baseSpeedLimit)
@@ -169,6 +159,7 @@ public class Car : MonoBehaviour
         FrontRightWheel.steerAngle = rotationSpeed * horizontalInput;
     }
 
+    //ENCAPSULATION
     //Setters
     protected void SetForwardSpeed(float fSpeed)
     {

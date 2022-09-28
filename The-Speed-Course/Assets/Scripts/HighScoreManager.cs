@@ -29,7 +29,7 @@ public class HighScoreManager : MonoBehaviour
         {
             if (HighScoreList.ElementAtOrDefault(i) != null)
             {
-                HighScorePos[i].GetComponent<TextMeshProUGUI>().text = HighScoreList[i].playerName + ": " + HighScoreList[i].playerTime.ToString("#.00") + " With " + HighScoreList[i].playerVehicle;
+                HighScorePos[i].GetComponent<TextMeshProUGUI>().text += HighScoreList[i].playerName + ": " + HighScoreList[i].playerTime.ToString("#.00") + " With " + HighScoreList[i].playerVehicle;
             }
             else
             {

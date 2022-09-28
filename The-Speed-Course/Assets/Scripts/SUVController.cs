@@ -29,11 +29,11 @@ public class SUVController : Car
 
     protected Rigidbody CarRb;
 
-
+    //INHERITANCE CHILD CLASS
     // Start is called before the first frame update
     void Start()
     {
-        SetForwardSpeed(60000);
+        SetForwardSpeed(40000);
         SetBackwardSpeed(20000);
         SetMaxSpeed(190);
         SetReverseMaxSpeed(30);

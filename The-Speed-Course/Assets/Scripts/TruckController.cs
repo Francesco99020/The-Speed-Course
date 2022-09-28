@@ -28,7 +28,7 @@ public class TruckController : Car
 
     protected Rigidbody CarRb;
 
-
+    //INHERITANCE CHILD CLASS
     // Start is called before the first frame update
     void Start()
     {
